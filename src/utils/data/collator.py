@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Dict, Optional, List
+from typing import Tuple, Optional, List
 
 import torch
 from torch.nn.utils.rnn import pad_sequence
@@ -8,7 +8,7 @@ from torch.nn.utils.rnn import pad_sequence
 @dataclass
 class Batch:
     waveform: torch.Tensor
-    waveforn_length: torch.Tensor
+    waveform_length: torch.Tensor
     transcript: List[str]
     tokens: torch.Tensor
     token_lengths: torch.Tensor
