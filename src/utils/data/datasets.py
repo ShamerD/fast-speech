@@ -1,15 +1,13 @@
 import torch
 import torchaudio
 
-from src.utils import ROOT_PATH
+from src.utils import DATA_DIR
 
 
 class LJSpeechDataset(torchaudio.datasets.LJSPEECH):
-    DATA_ROOT = ROOT_PATH / "data"
-
     def __init__(self):
-        self.DATA_ROOT.mkdir(parents=True, exist_ok=True)
-        super().__init__(root=self.DATA_ROOT, download=True)
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        super().__init__(root=DATA_DIR, download=True)
         self._tokenizer = torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH.get_text_processor()
 
     def __getitem__(self, index: int):
