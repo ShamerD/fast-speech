@@ -9,7 +9,7 @@ from torch.nn.utils.rnn import pad_sequence
 import torchaudio
 
 from src.utils.config_parser import ConfigParser
-
+from src.utils import CHECKPOINT_DIR
 
 @dataclass
 class Point:
@@ -38,8 +38,10 @@ class GraphemeAligner(nn.Module):
     def __init__(self, config: ConfigParser):
         super().__init__()
 
+        CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
         bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
-        self._wav2vec2 = bundle.get_model()
+
+        self._wav2vec2 = bundle.get_model(dl_kwargs={"model_dir": str(CHECKPOINT_DIR)})
         self._labels = bundle.get_labels()
         self._char2index = {c: i for i, c in enumerate(self._labels)}
         self._unk_index = self._char2index['<unk>']

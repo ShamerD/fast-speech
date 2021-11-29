@@ -1,5 +1,7 @@
-from waveglow import Waveglow
+from .waveglow import Waveglow
+from .aligner import GraphemeAligner
 
 __all__ = [
-    "Waveglow"
+    "Waveglow",
+    "GraphemeAligner"
 ]
