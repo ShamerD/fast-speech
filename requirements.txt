@@ -2,3 +2,5 @@ torch==1.10.0+cu111
 
 torchaudio==0.10.0+cu111
 librosa==0.8.1
+
+googledrivedownloader==0.4
