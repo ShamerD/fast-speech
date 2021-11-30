@@ -110,8 +110,8 @@ class LengthRegulator(nn.Module):
             kernel = (kernel, kernel)
         pad = [k // 2 for k in kernel]
 
-        self.conv1 = nn.Conv1d(d_model, d_conv, (kernel,), padding=pad)
-        self.conv2 = nn.Conv1d(d_conv, d_conv, (kernel,), padding=pad)
+        self.conv1 = nn.Conv1d(d_model, d_conv, (kernel[0],), padding=pad[0])
+        self.conv2 = nn.Conv1d(d_conv, d_conv, (kernel[1],), padding=pad[1])
 
         self.ln1 = nn.LayerNorm(d_conv)
         self.ln2 = nn.LayerNorm(d_conv)
