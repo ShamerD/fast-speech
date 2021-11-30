@@ -4,19 +4,14 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
+from src.model.default_config import ModelConfig
 
 
 class MultiHeadSelfAttention(nn.Module):
-    def __init__(self,
-                 d_model: int,
-                 n_heads: int,
-                 p_dropout: float):
-        """
-        :param d_model: model dimension
-        :param n_heads: number of heads
-        :param p_dropout: dropout probability
-        """
+    def __init__(self, config: ModelConfig):
         super().__init__()
+        d_model = config.d_model
+        n_heads = config.fft_n_heads
 
         assert d_model % n_heads == 0
         self.d_model = d_model
@@ -29,7 +24,7 @@ class MultiHeadSelfAttention(nn.Module):
         self.V = nn.Linear(d_model, d_model)
         self.out = nn.Linear(d_model, d_model)
 
-        self.drop = nn.Dropout(p_dropout)
+        self.drop = nn.Dropout(config.p_dropout)
 
     def forward(self, x, mask=None):
         """
@@ -61,32 +56,24 @@ class MultiHeadSelfAttention(nn.Module):
 
 
 class FFTBlock(nn.Module):
-    def __init__(self,
-                 d_model: int,
-                 n_heads: int,
-                 p_dropout: float,
-                 d_conv: int,
-                 kernels: List[int],
-                 pads: List[int],
-                 norm_first: bool = True):
-        """
-        :param d_model: model dimension
-        :param n_heads: number of heads
-        :param p_dropout: dropout probability
-        :param d_conv: number of channels in inner conv
-        :param kernels: kernel sizes for convs (eg. [3, 3])
-        :param pads: paddings for convs (eg. [1, 1])
-        :param norm_first: whether to calculate norm before sublayers
-        """
+    def __init__(self, config: ModelConfig):
         super().__init__()
-        self.mha = MultiHeadSelfAttention(d_model, n_heads, p_dropout)
+        d_model = config.d_model
+        p_dropout = config.p_dropout
+        d_conv = config.fft_d_conv
+        kernel = config.fft_kernel
+        if type(kernel) is int:
+            kernel = (kernel, kernel)
+        pads = [k // 2 for k in kernel]
+
+        self.mha = MultiHeadSelfAttention(config)
         self.conv = nn.Sequential(
-            nn.Conv1d(d_model, d_conv, (kernels[0],), padding=pads[0]),
+            nn.Conv1d(d_model, d_conv, (kernel[0],), padding=pads[0]),
             nn.ReLU(),
             nn.Dropout(p_dropout),
-            nn.Conv1d(d_conv, d_model, (kernels[1],), padding=pads[1])
+            nn.Conv1d(d_conv, d_model, (kernel[1],), padding=pads[1])
         )
-        self.norm_first = norm_first
+        self.norm_first = config.fft_norm_first
         self.ln_mha = nn.LayerNorm(d_model)
         self.ln_conv = nn.LayerNorm(d_model)
         self.drop_mha = nn.Dropout(p_dropout)
@@ -112,22 +99,27 @@ class FFTBlock(nn.Module):
 
 
 class LengthRegulator(nn.Module):
-    def __init__(self,
-                 d_model: int,
-                 d_duration: int,
-                 duration_kernel: int,
-                 p_dropout: float,
-                 alpha: float = 1.0):
+    def __init__(self, config: ModelConfig):
         super().__init__()
-        pad = duration_kernel // 2
-        self.conv1 = nn.Conv1d(d_model, d_duration, (duration_kernel,), padding=pad)
-        self.conv2 = nn.Conv1d(d_duration, d_duration, (duration_kernel,), padding=pad)
-        self.ln1 = nn.LayerNorm(d_duration)
-        self.ln2 = nn.LayerNorm(d_duration)
+        d_model = config.d_model
+        d_conv = config.duration_d_conv
+        p_dropout = config.p_dropout
+
+        kernel = config.duration_kernel
+        if type(kernel) is int:
+            kernel = (kernel, kernel)
+        pad = [k // 2 for k in kernel]
+
+        self.conv1 = nn.Conv1d(d_model, d_conv, (kernel,), padding=pad)
+        self.conv2 = nn.Conv1d(d_conv, d_conv, (kernel,), padding=pad)
+
+        self.ln1 = nn.LayerNorm(d_conv)
+        self.ln2 = nn.LayerNorm(d_conv)
+
         self.drop1 = nn.Dropout(p_dropout)
         self.drop2 = nn.Dropout(p_dropout)
-        self.predictor = nn.Linear(d_duration, 1)
-        self.alpha = alpha
+        self.predictor = nn.Linear(d_conv, 1)
+        self.alpha = config.duration_alpha
 
     def forward(self, x, true_durations=None):
         """
@@ -146,7 +138,7 @@ class LengthRegulator(nn.Module):
         # pred_lens is [B, N]
 
         durations = true_durations if true_durations is not None else pred_lens.detach().exp().cpu()
-        durations = torch.round(durations).to(torch.long)
+        durations = torch.round(durations * self.alpha).to(torch.long)
 
         return self._create_extended_sequence(x, durations), pred_lens
 
