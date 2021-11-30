@@ -1,3 +1,5 @@
+from typing import List
+
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -54,3 +56,40 @@ class MultiHeadSelfAttention(nn.Module):
                          .reshape(bsize, seq_len, self.d_model)
 
         return self.out(attention)
+
+
+class FFTBlock(nn.Module):
+    def __init__(self,
+                 d_model: int,
+                 n_heads: int,
+                 p_dropout: float,
+                 d_conv: int,
+                 kernels: List[int],
+                 pads: List[int],
+                 norm_first: bool = True):
+        super().__init__()
+        self.mha = MultiHeadSelfAttention(d_model, n_heads, p_dropout)
+        self.conv = nn.Sequential(
+            nn.Conv1d(d_model, d_conv, kernels[0], padding=pads[0]),
+            nn.ReLU(),
+            nn.Dropout(p_dropout),
+            nn.Conv1d(d_conv, d_model, kernels[1], padding=pads[1])
+        )
+        self.norm_first = norm_first
+        self.ln_mha = nn.LayerNorm(d_model)
+        self.ln_conv = nn.LayerNorm(d_model)
+        self.drop_mha = nn.Dropout(p_dropout)
+        self.drop_conv = nn.Dropout(p_dropout)
+
+    def forward(self, x, mask=None):
+        if self.norm_first:
+            x = x + self.drop_mha(self.mha(self.ln_mha(x), mask))
+            x = x + self.drop_conv(self.conv(
+                self.ln_conv(x).transpose(-1, -2)).transpose(-1, -2)
+            )
+        else:
+            x = self.ln_mha(x + self.drop_mha(self.mha(x), mask))
+            x = self.ln_conv(x + self.drop_conv(
+                self.conv(x.transpose(-1, -2)).transpose(-1, -2)
+            ))
+        return x
