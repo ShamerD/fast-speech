@@ -20,6 +20,7 @@ class Waveglow(nn.Module):
 
         model = torch.load(model_path, map_location='cpu')['model']
         self.net = model.remove_weightnorm(model)
+        self.sr = 22050
 
     @torch.no_grad()
     def inference(self, spec: torch.Tensor):

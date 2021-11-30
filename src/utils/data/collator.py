@@ -9,13 +9,30 @@ from torch.nn.utils.rnn import pad_sequence
 class Batch:
     waveform: torch.Tensor
     waveform_length: torch.Tensor
+
     transcript: List[str]
     tokens: torch.Tensor
     token_lengths: torch.Tensor
+
     durations: Optional[torch.Tensor] = None
+    durations_pred: Optional[torch.Tensor] = None
+
+    mels: Optional[torch.Tensor] = None
+    mels_pred: Optional[torch.Tensor] = None
+
+    mel_loss: Optional[torch.Tensor] = None
+    dur_loss: Optional[torch.Tensor] = None
+    loss: Optional[torch.Tensor] = None
 
     def to(self, device: torch.device) -> 'Batch':
-        raise NotImplementedError
+        self.waveform = self.waveform.to(device)
+        self.tokens = self.tokens.to(device)
+        if self.mels is not None:
+            self.mels = self.mels.to(device)
+        if self.mels_pred is not None:
+            self.mels_pred = self.mels_pred.to(device)
+
+        return self
 
 
 class LJSpeechCollator:
