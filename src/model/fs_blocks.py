@@ -3,6 +3,7 @@ from typing import List
 import torch
 from torch import nn
 import torch.nn.functional as F
+from torch.nn.utils.rnn import pad_sequence
 
 
 class MultiHeadSelfAttention(nn.Module):
@@ -80,10 +81,10 @@ class FFTBlock(nn.Module):
         super().__init__()
         self.mha = MultiHeadSelfAttention(d_model, n_heads, p_dropout)
         self.conv = nn.Sequential(
-            nn.Conv1d(d_model, d_conv, kernels[0], padding=pads[0]),
+            nn.Conv1d(d_model, d_conv, (kernels[0],), padding=pads[0]),
             nn.ReLU(),
             nn.Dropout(p_dropout),
-            nn.Conv1d(d_conv, d_model, kernels[1], padding=pads[1])
+            nn.Conv1d(d_conv, d_model, (kernels[1],), padding=pads[1])
         )
         self.norm_first = norm_first
         self.ln_mha = nn.LayerNorm(d_model)
@@ -92,6 +93,11 @@ class FFTBlock(nn.Module):
         self.drop_conv = nn.Dropout(p_dropout)
 
     def forward(self, x, mask=None):
+        """
+        :param x: input sequence of shape [B, N, d_model]
+        :param mask: boolean padding mask of shape [B, N] (True where to mask)
+        :return: sequence of the same shape as x after FFTBlock
+        """
         if self.norm_first:
             x = x + self.drop_mha(self.mha(self.ln_mha(x), mask))
             x = x + self.drop_conv(self.conv(
@@ -103,3 +109,55 @@ class FFTBlock(nn.Module):
                 self.conv(x.transpose(-1, -2)).transpose(-1, -2)
             ))
         return x
+
+
+class LengthRegulator(nn.Module):
+    def __init__(self,
+                 d_model: int,
+                 d_duration: int,
+                 duration_kernel: int,
+                 p_dropout: float,
+                 alpha: float = 1.0):
+        super().__init__()
+        pad = duration_kernel // 2
+        self.conv1 = nn.Conv1d(d_model, d_duration, (duration_kernel,), padding=pad)
+        self.conv2 = nn.Conv1d(d_duration, d_duration, (duration_kernel,), padding=pad)
+        self.ln1 = nn.LayerNorm(d_duration)
+        self.ln2 = nn.LayerNorm(d_duration)
+        self.drop1 = nn.Dropout(p_dropout)
+        self.drop2 = nn.Dropout(p_dropout)
+        self.predictor = nn.Linear(d_duration, 1)
+        self.alpha = alpha
+
+    def forward(self, x, true_durations=None):
+        """
+        :param x: input sequence of shape [B, N, d_model]
+        :param true_durations: absolute floats predicted by aligner, will be used in train
+        :return: output sequence of shape [B, N_new, d_model]
+        :return: predicted log(lengths) of shape [B, N]
+        """
+        pred_lens = self.drop1(F.relu(self.ln1(
+            self.conv1(x.transpose(-1, -2)).transpose(-1, -2)
+        )))
+        pred_lens = self.drop2(F.relu(self.ln2(
+            self.conv2(pred_lens.transpose(-1, -2)).transpose(-1, -2)
+        )))
+        pred_lens = self.predictor(pred_lens).squeeze(-1)
+        # pred_lens is [B, N]
+
+        durations = true_durations if true_durations is not None else pred_lens.detach().exp().cpu()
+        durations = torch.round(durations).to(torch.long)
+
+        return self._create_extended_sequence(x, durations), pred_lens
+
+    @staticmethod
+    def _create_extended_sequence(old_seq, durations):
+        """
+        :param old_seq: sequence to be extended, shape is [B, N, d_model]
+        :param durations: durations of each element, shape is [B, N]
+        :return: new_seq: extended sequence of shape [B, N_new, d_model]
+        """
+        new_seq = []
+        for seq, dur in zip(old_seq, durations):
+            new_seq.append(torch.repeat_interleave(seq, dur, dim=-2))
+        return pad_sequence(new_seq, batch_first=True)
