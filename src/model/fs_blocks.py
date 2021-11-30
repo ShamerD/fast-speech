@@ -13,7 +13,7 @@ class MultiHeadSelfAttention(nn.Module):
         """
         :param d_model: model dimension
         :param n_heads: number of heads
-        :param p_dropout: dropout probability (in calculating energy)
+        :param p_dropout: dropout probability
         """
         super().__init__()
 
@@ -38,6 +38,7 @@ class MultiHeadSelfAttention(nn.Module):
         """
         bsize = x.size(0)
         seq_len = x.size(1)
+        assert x.size(2) == self.d_model
 
         q = self.Q(x).view(bsize, seq_len, self.n_heads, self.d_k).transpose(1, 2)
         k = self.K(x).view(bsize, seq_len, self.n_heads, self.d_k).transpose(1, 2)
@@ -67,6 +68,15 @@ class FFTBlock(nn.Module):
                  kernels: List[int],
                  pads: List[int],
                  norm_first: bool = True):
+        """
+        :param d_model: model dimension
+        :param n_heads: number of heads
+        :param p_dropout: dropout probability
+        :param d_conv: number of channels in inner conv
+        :param kernels: kernel sizes for convs (eg. [3, 3])
+        :param pads: paddings for convs (eg. [1, 1])
+        :param norm_first: whether to calculate norm before sublayers
+        """
         super().__init__()
         self.mha = MultiHeadSelfAttention(d_model, n_heads, p_dropout)
         self.conv = nn.Sequential(
