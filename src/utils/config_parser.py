@@ -8,7 +8,7 @@ from functools import reduce, partial
 from operator import getitem
 from pathlib import Path
 
-# TODO: from hw_asr.logger import setup_logging
+from src.logger import setup_logging
 from src.utils import read_json, write_json, ROOT_PATH
 
 CustomArgs = collections.namedtuple("CustomArgs", "flags type target")
@@ -46,7 +46,7 @@ class ConfigParser:
         write_json(self.config, self.save_dir / "config.json")
 
         # configure logging module
-        # TODO: setup_logging(self.log_dir)
+        setup_logging(self.log_dir)
         self.log_levels = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
 
     @classmethod
