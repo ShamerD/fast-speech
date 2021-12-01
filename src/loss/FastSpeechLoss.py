@@ -18,7 +18,7 @@ class FastSpeechLoss(nn.Module):
 
         dur_loss = self.dur_loss(batch.durations, batch.durations_pred)
 
-        min_size = min(batch.mels.size(-1), batch.mels_pred.size(-1))
-        mel_loss = self.mel_loss(batch.mels[:, :, :min_size], batch.mels[:, :, :min_size])
+        min_seq_len = min(batch.mels.size(-1), batch.mels_pred.size(-1))
+        mel_loss = self.mel_loss(batch.mels[:, :, :min_seq_len], batch.mels_pred[:, :, :min_seq_len])
 
         return mel_loss, dur_loss
