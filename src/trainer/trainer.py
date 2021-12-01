@@ -221,14 +221,16 @@ class Trainer(BaseTrainer):
         self._log_spectrogram("true spectrogram", batch.mels[idx])
         self._log_spectrogram("predicted spectrogram", batch.mels_pred[idx])
         self._log_audio("true audio", batch.waveform[idx, :batch.waveform_length[idx]])
-        self._log_audio("generated audio", self.vocoder.inference(batch.mels_pred[idx]))
+        self._log_audio("generated audio", self.vocoder.inference(
+                            batch.mels_pred[idx].unsqueeze(0)
+                        ).squeeze())
 
     def _log_spectrogram(self, spec_name, spectrogram):
         image = PIL.Image.open(plot_spectrogram_to_buf(spectrogram.cpu().log()))
         self.writer.add_image(spec_name, image)
 
     def _log_audio(self, audio_name, audio):
-        self.writer.add_audio(audio_name, audio, self.wav2mel.config.sr)
+        self.writer.add_audio(audio_name, audio.cpu(), self.wav2mel.config.sr)
 
     @torch.no_grad()
     def get_grad_norm(self, norm_type=2):
