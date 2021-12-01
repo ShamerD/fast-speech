@@ -29,7 +29,6 @@ class Trainer(BaseTrainer):
             aligner: GraphemeAligner,
             vocoder: Waveglow,
             criterion: nn.Module,
-            metrics: List,
             optimizer: torch.optim.Optimizer,
             config: ConfigParser,
             device: torch.device,
@@ -39,7 +38,7 @@ class Trainer(BaseTrainer):
             len_epoch: Optional[int] = None,
             skip_oom: bool = True,
     ):
-        super().__init__(model, criterion, metrics, optimizer, config, device)
+        super().__init__(model, criterion, optimizer, config, device)
         self.wav2mel = wav2mel
         self.aligner = aligner
         self.vocoder = vocoder
@@ -63,12 +62,10 @@ class Trainer(BaseTrainer):
         self.log_step = 100
 
         self.train_metrics = MetricTracker(
-            "loss", "mel_loss", "duration_loss", "grad norm",
-            *[m.name for m in self.metrics if m.use_on_train], writer=self.writer
+            "loss", "mel_loss", "duration_loss", "grad norm", writer=self.writer
         )
         self.valid_metrics = MetricTracker(
-            "loss", "mel_loss", "duration_loss",
-            *[m.name for m in self.metrics if m.use_on_val], writer=self.writer
+            "loss", "mel_loss", "duration_loss", writer=self.writer
         )
 
     def _clip_grad_norm(self):
@@ -166,10 +163,6 @@ class Trainer(BaseTrainer):
         metrics.update("loss", batch.loss.item())
         metrics.update("mel_loss", batch.mel_loss.item())
         metrics.update("duration_loss", batch.dur_loss.item())
-
-        for met in self.metrics:
-            if met.name in metrics.keys():
-                metrics.update(met.name, met(batch))
 
         return batch
 

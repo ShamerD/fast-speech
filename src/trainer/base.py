@@ -15,7 +15,6 @@ class BaseTrainer:
     def __init__(self,
                  model: torch.nn.Module,
                  criterion: torch.nn.Module,
-                 metrics,
                  optimizer: torch.optim.Optimizer,
                  config: ConfigParser,
                  device: torch.device):
@@ -25,7 +24,6 @@ class BaseTrainer:
 
         self.model = model
         self.criterion = criterion
-        self.metrics = metrics
         self.optimizer = optimizer
 
         # for interrupt saving

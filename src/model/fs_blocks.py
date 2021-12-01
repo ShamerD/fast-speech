@@ -85,6 +85,9 @@ class FFTBlock(nn.Module):
         :param mask: boolean padding mask of shape [B, N] (True where to mask)
         :return: sequence of the same shape as x after FFTBlock
         """
+        # norm_first is the only thing i checked in torch docs
+        # (https://pytorch.org/docs/stable/_modules/torch/nn/modules/transformer.html#Transformer)
+        # This is done to make model more configurable
         if self.norm_first:
             x = x + self.drop_mha(self.mha(self.ln_mha(x), mask))
             x = x + self.drop_conv(self.conv(
