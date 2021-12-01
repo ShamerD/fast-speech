@@ -226,7 +226,7 @@ class Trainer(BaseTrainer):
                         ).squeeze())
 
     def _log_spectrogram(self, spec_name, spectrogram):
-        image = PIL.Image.open(plot_spectrogram_to_buf(spectrogram.cpu().log()))
+        image = PIL.Image.open(plot_spectrogram_to_buf(spectrogram.cpu()))
         self.writer.add_image(spec_name, image)
 
     def _log_audio(self, audio_name, audio):
