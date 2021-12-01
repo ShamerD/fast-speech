@@ -67,6 +67,6 @@ class FastSpeech(nn.Module):
         x = self.encoder(batch.tokens)
         x, log_pred_lens = self.length_regulator(x, batch.durations)
         x = self.decoder(x)
-        mels = self.mel_pred(x)
+        mels = self.mel_pred(x).transpose(-1, -2)  # to make it [B, n_mels, N]
 
         return mels, log_pred_lens
