@@ -9,3 +9,10 @@ Text-to-Speech model trained on LJSpeech.
 git clone https://github.com/NVIDIA/waveglow.git
 pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 ```
+
+## Usage
+Train:
+```shell
+python3 train.py -c <config_file> [-r <resume_checkpoint>] [--lr <learning_rate>] [--bs <batch_size>]
+```
+
