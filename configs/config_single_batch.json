@@ -1,0 +1,50 @@
+{
+  "name": "default_config",
+  "n_gpu": 1,
+  "mel_config": {
+    "type": "MelSpectrogramConfig",
+    "args": {
+    }
+  },
+  "model_config": {
+    "type": "ModelConfig",
+    "args": {
+    }
+  },
+  "data": {
+    "batch_size": 16,
+    "num_workers": 4,
+    "limit": 16
+  },
+  "optimizer": {
+    "type": "Adam",
+    "args": {
+      "lr": 3e-4
+    }
+  },
+  "loss": {
+    "type": "FastSpeechLoss",
+    "args": {}
+  },
+  "lr_scheduler": {
+    "type": "OneCycleLR",
+    "args": {
+      "steps_per_epoch": 1000,
+      "epochs": 50,
+      "anneal_strategy": "cos",
+      "max_lr": 4e-3,
+      "pct_start": 0.2
+    }
+  },
+  "trainer": {
+    "epochs": 50,
+    "save_dir": "saved/",
+    "save_period": 5,
+    "verbosity": 2,
+    "monitor": "min val_loss",
+    "visualize": "wandb",
+    "wandb_project": "tts_project",
+    "len_epoch": 1000,
+    "grad_norm_clip": 10
+  }
+}
