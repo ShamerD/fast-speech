@@ -1,3 +1,5 @@
+import warnings
+
 import torch
 from torch import nn
 
@@ -10,6 +12,7 @@ class Waveglow(nn.Module):
 
     def __init__(self, checkpoint='waveglow_256channels_universal_v5.pt'):
         super().__init__()
+        self.sr = 22050
 
         model_path = CHECKPOINT_DIR / checkpoint
         if not model_path.exists():
@@ -18,9 +21,10 @@ class Waveglow(nn.Module):
                 dest_path=str(model_path)
             )
 
-        model = torch.load(model_path, map_location='cpu')['model']
-        self.net = model.remove_weightnorm(model)
-        self.sr = 22050
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            model = torch.load(model_path, map_location='cpu')['model']
+            self.net = model.remove_weightnorm(model)
 
     @torch.no_grad()
     def inference(self, spec: torch.Tensor):
