@@ -1,13 +1,10 @@
 import random
-from random import shuffle
 from typing import Optional, List
 
 import torch
 from torch import nn
-import torch.nn.functional as F
 from torch.nn.utils import clip_grad_norm_
 from torch.utils.data import DataLoader
-import torchaudio
 
 import PIL
 from tqdm import tqdm
@@ -155,6 +152,7 @@ class Trainer(BaseTrainer):
         mels, log_lengths = self.model(batch)
 
         batch.mels_pred = mels
+        batch.durations_pred = log_lengths.exp()
         batch.mel_loss, batch.dur_loss = self.criterion(batch)
         batch.loss = batch.mel_loss + batch.dur_loss
 

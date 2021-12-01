@@ -7,18 +7,18 @@ from torch.nn.utils.rnn import pad_sequence
 
 @dataclass
 class Batch:
-    waveform: torch.Tensor
-    waveform_length: torch.Tensor
+    waveform: torch.Tensor                              # [B, L]
+    waveform_length: torch.Tensor                       # [B]
 
     transcript: List[str]
-    tokens: torch.Tensor
-    token_lengths: torch.Tensor
+    tokens: torch.Tensor                                # [B, N]
+    token_lengths: torch.Tensor                         # [B]
 
-    durations: Optional[torch.Tensor] = None
-    durations_pred: Optional[torch.Tensor] = None
+    durations: Optional[torch.Tensor] = None            # [B, N]
+    durations_pred: Optional[torch.Tensor] = None       # [B, N]
 
-    mels: Optional[torch.Tensor] = None
-    mels_pred: Optional[torch.Tensor] = None
+    mels: Optional[torch.Tensor] = None                 # [B, n_mels, N]
+    mels_pred: Optional[torch.Tensor] = None            # [B, n_mels, N']
 
     mel_loss: Optional[torch.Tensor] = None
     dur_loss: Optional[torch.Tensor] = None
