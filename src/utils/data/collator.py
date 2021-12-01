@@ -26,7 +26,7 @@ class Batch:
 
     def to(self, device: torch.device) -> 'Batch':
         self.waveform = self.waveform.to(device)
-        self.waveform_length = self.waveform.to(device)
+        self.waveform_length = self.waveform_length.to(device)
 
         self.tokens = self.tokens.to(device)
         self.token_lengths = self.token_lengths.to(device)
