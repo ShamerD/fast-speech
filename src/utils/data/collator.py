@@ -26,7 +26,16 @@ class Batch:
 
     def to(self, device: torch.device) -> 'Batch':
         self.waveform = self.waveform.to(device)
+        self.waveform_length = self.waveform.to(device)
+
         self.tokens = self.tokens.to(device)
+        self.token_lengths = self.token_lengths.to(device)
+
+        if self.durations is not None:
+            self.durations = self.durations.to(device)
+        if self.durations_pred is not None:
+            self.durations_pred = self.durations_pred.to(device)
+
         if self.mels is not None:
             self.mels = self.mels.to(device)
         if self.mels_pred is not None:

@@ -136,12 +136,12 @@ class Trainer(BaseTrainer):
             metrics: MetricTracker
     ):
         batch = batch.to(self.device)
-
         with torch.no_grad():
             batch.mels = self.wav2mel(batch.waveform)
 
             # TODO: what to do with validation?
             batch.durations = self.aligner(batch.waveform, batch.waveform_length, batch.transcript) * batch.mels.size(-1)
+        batch = batch.to(self.device)
 
         if is_train:
             self.optimizer.zero_grad()
