@@ -8,7 +8,7 @@ from torch.nn.utils.rnn import pad_sequence
 
 import torchaudio
 
-from src.utils.config_parser import ConfigParser
+from src.utils.data import MelSpectrogramConfig
 from src.utils import CHECKPOINT_DIR
 
 @dataclass
@@ -35,7 +35,7 @@ class Segment:
 
 class GraphemeAligner(nn.Module):
 
-    def __init__(self, config: ConfigParser):
+    def __init__(self, config: MelSpectrogramConfig):
         super().__init__()
 
         CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
@@ -46,7 +46,7 @@ class GraphemeAligner(nn.Module):
         self._char2index = {c: i for i, c in enumerate(self._labels)}
         self._unk_index = self._char2index['<unk>']
         self._resampler = torchaudio.transforms.Resample(
-            orig_freq=config['melspec']['sr'], new_freq=bundle.sample_rate
+            orig_freq=config.sr, new_freq=bundle.sample_rate
         )
 
     def _decode_text(self, text: str):
