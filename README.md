@@ -6,5 +6,6 @@ Text-to-Speech model trained on LJSpeech.
  
 ## Installation
 ```shell
+git clone https://github.com/NVIDIA/waveglow.git
 pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 ```
