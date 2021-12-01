@@ -140,8 +140,8 @@ class LengthRegulator(nn.Module):
         pred_lens = self.predictor(pred_lens).squeeze(-1)
         # pred_lens is [B, N]
 
-        durations = true_durations if true_durations is not None else pred_lens.detach().exp().cpu()
-        durations = torch.round(durations * self.alpha).to(torch.long)
+        durations = true_durations if true_durations is not None else pred_lens.detach().exp()
+        durations = torch.round(durations * self.alpha).to(torch.long).to(x.device)
 
         return self._create_extended_sequence(x, durations), pred_lens
 
