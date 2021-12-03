@@ -34,6 +34,7 @@ class Trainer(BaseTrainer):
             device: torch.device,
             data_loader: torch.utils.data.DataLoader,
             valid_data_loader=None,
+            inference_data_loader=None,
             lr_scheduler=None,
             len_epoch: Optional[int] = None,
             skip_oom: bool = True,
@@ -57,6 +58,9 @@ class Trainer(BaseTrainer):
 
         self.valid_data_loader = valid_data_loader
         self.do_validation = self.valid_data_loader is not None
+
+        self.inference_loader = inference_data_loader
+        self.do_inference = self.inference_loader is not None
 
         self.lr_scheduler = lr_scheduler
         self.log_step = 100

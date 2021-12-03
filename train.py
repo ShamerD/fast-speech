@@ -1,5 +1,4 @@
 import argparse
-import collections
 import dataclasses
 import sys
 import warnings
@@ -67,6 +66,7 @@ def main(config: ConfigParser):
         device=device,
         data_loader=dataloaders["train"],
         valid_data_loader=dataloaders["val"],
+        inference_data_loader=dataloaders["inference"],
         lr_scheduler=lr_scheduler,
         len_epoch=config["trainer"].get("len_epoch", None)
     )

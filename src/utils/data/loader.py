@@ -17,8 +17,8 @@ def get_dataloaders(data_config: Dict):
     val_dataset = None
 
     if 'val_path' in data_config and 'train_path' in data_config:
-        val_idx = np.load(LJ_DATA_DIR / "val.npy")
-        train_idx = np.load(LJ_DATA_DIR / "train.npy")
+        val_idx = np.load(data_config['val_path'])
+        train_idx = np.load(data_config['train_path'])
 
         val_dataset = Subset(dataset, val_idx)
         train_dataset = Subset(dataset, train_idx)

@@ -12,9 +12,10 @@
     }
   },
   "data": {
-    "batch_size": 16,
-    "num_workers": 4,
-    "limit": 16
+    "train_path": "data/LJSpeech-1.1/train.npy",
+    "val_path": "data/LJSpeech-1.1/val.npy",
+    "batch_size": 64,
+    "num_workers": 4
   },
   "optimizer": {
     "type": "Adam",
