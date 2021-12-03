@@ -19,6 +19,7 @@ class Batch:
 
     mels: Optional[torch.Tensor] = None                 # [B, n_mels, T]
     mels_pred: Optional[torch.Tensor] = None            # [B, n_mels, T']
+    mels_length: Optional[torch.Tensor] = None          # [B]
 
     mel_loss: Optional[torch.Tensor] = None
     dur_loss: Optional[torch.Tensor] = None

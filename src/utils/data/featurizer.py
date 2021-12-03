@@ -62,9 +62,11 @@ class MelSpectrogram(nn.Module):
 
         return mel
 
-    def transform_wav_lengths(self, wav_lengths: torch.LongTensor):
+    def transform_wav_lengths(self, wav_lengths: torch.Tensor):
+        # if no padding this should be (N - window + hop) // hop
+        # but by default MelSpectrogram pads left and right by (window // 2)
         return torch.div(
-            wav_lengths - self.config.win_length + self.config.hop_length,
+            wav_lengths + self.config.hop_length,
             self.config.hop_length,
             rounding_mode='trunc'
         )

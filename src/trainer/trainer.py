@@ -138,6 +138,7 @@ class Trainer(BaseTrainer):
         batch = batch.to(self.device)
         with torch.no_grad():
             batch.mels = self.wav2mel(batch.waveform)
+            batch.mels_length = self.wav2mel.transform_wav_lengths(batch.waveform_length)
 
             # TODO: what to do with validation?
             # TODO: wrong scaling to mels
