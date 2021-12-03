@@ -33,6 +33,10 @@ data/
 !src/utils/data
 resources/
 
+# Data split
+!data/LJSpeech-1.1/train.npy
+!data/LJSpeech-1.1/val.npy
+
 # Logs
 wandb/
 saved/
