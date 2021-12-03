@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 
 from src.utils.data import Batch
@@ -15,10 +16,15 @@ class FastSpeechLoss(nn.Module):
 
     def forward(self, batch: Batch):
         assert batch.durations.size() == batch.durations_pred.size()
+        batch_size = batch.durations.size(0)
 
         dur_loss = self.dur_loss(batch.durations, batch.durations_pred)
 
-        min_seq_len = min(batch.mels.size(-1), batch.mels_pred.size(-1))
-        mel_loss = self.mel_loss(batch.mels[:, :, :min_seq_len], batch.mels_pred[:, :, :min_seq_len])
+        mel_lens = torch.minimum(batch.mels_length, batch.mels_pred_length)
+
+        mel_losses = torch.zeros(batch_size)
+        for i in range(batch_size):
+            mel_losses[i] = self.mel_loss(batch.mels[:, :, :mel_lens[i]], batch.mels_pred[:, :, :mel_lens[i]])
+        mel_loss = mel_losses.mean()
 
         return mel_loss, dur_loss
