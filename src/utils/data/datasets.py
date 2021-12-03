@@ -12,21 +12,13 @@ class LJSpeechDataset(torchaudio.datasets.LJSPEECH):
         super().__init__(root=DATA_DIR, download=True)
         self._tokenizer = torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH.get_text_processor()
 
-        self.normalized_transcripts = []
-
-        tokenizer_tokens = set(self._tokenizer.tokens)
-        for i in range(super().__len__()):
-            transcript = super().__getitem__(i)[3]
-            transcript = self._remove_accents(transcript)
-            transcript = "".join(c for c in transcript if c in tokenizer_tokens)
-            self.normalized_transcripts.append(transcript)
-
     def __getitem__(self, index: int):
         waveform, _, _, transcript = super().__getitem__(index)
         waveform_length = torch.tensor([waveform.shape[-1]]).int()
 
-        transcript = self.normalized_transcripts[index]
+        transcript = self._remove_accents(transcript)
         tokens, token_lengths = self._tokenizer(transcript)
+        transcript = self.decode(tokens, token_lengths)[0]
 
         return waveform, waveform_length, transcript, tokens, token_lengths
 
