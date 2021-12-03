@@ -20,6 +20,7 @@ class Batch:
     mels: Optional[torch.Tensor] = None                 # [B, n_mels, T]
     mels_pred: Optional[torch.Tensor] = None            # [B, n_mels, T']
     mels_length: Optional[torch.Tensor] = None          # [B]
+    mels_pred_length: Optional[torch.Tensor] = None     # [B]
 
     mel_loss: Optional[torch.Tensor] = None
     dur_loss: Optional[torch.Tensor] = None
@@ -41,6 +42,11 @@ class Batch:
             self.mels = self.mels.to(device)
         if self.mels_pred is not None:
             self.mels_pred = self.mels_pred.to(device)
+
+        if self.mels_length is not None:
+            self.mels_length = self.mels_length.to(device)
+        if self.mels_pred_length is not None:
+            self.mels_pred_length = self.mels_pred_length.to(device)
 
         return self
 

@@ -142,8 +142,9 @@ class LengthRegulator(nn.Module):
 
         durations = true_durations if true_durations is not None else pred_lens.detach().exp()
         durations = torch.round(durations * self.alpha).to(torch.long)
+        total_lens = durations.sum(-1)
 
-        return self._create_extended_sequence(x, durations), pred_lens
+        return self._create_extended_sequence(x, durations), pred_lens, total_lens
 
     @staticmethod
     def _create_extended_sequence(old_seq, durations):

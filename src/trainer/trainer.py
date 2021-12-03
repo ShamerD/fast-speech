@@ -141,16 +141,17 @@ class Trainer(BaseTrainer):
             batch.mels_length = self.wav2mel.transform_wav_lengths(batch.waveform_length)
 
             # TODO: what to do with validation?
-            # TODO: wrong scaling to mels
-            batch.durations = self.aligner(batch.waveform, batch.waveform_length, batch.transcript) * batch.mels.size(-1)
-        batch = batch.to(self.device)
+            batch.durations = (self.aligner(batch.waveform,
+                                            batch.waveform_length,
+                                            batch.transcript) * batch.mels_length.unsqueeze(1)).to(self.device)
 
         if is_train:
             self.optimizer.zero_grad()
 
-        mels, log_lengths = self.model(batch)
+        mels, log_lengths, mels_lens = self.model(batch)
 
         batch.mels_pred = mels
+        batch.mels_pred_length = mels_lens
         batch.durations_pred = log_lengths.exp()
         batch.mel_loss, batch.dur_loss = self.criterion(batch)
         batch.loss = batch.mel_loss + batch.dur_loss
@@ -224,8 +225,8 @@ class Trainer(BaseTrainer):
         self._log_spectrogram("predicted spectrogram", batch.mels_pred[idx])
         self._log_audio("true audio", batch.waveform[idx, :batch.waveform_length[idx]])
         self._log_audio("generated audio", self.vocoder.inference(
-                            batch.mels_pred[idx].unsqueeze(0)
-                        ).squeeze())
+            batch.mels_pred[idx].unsqueeze(0)
+        ).squeeze())
 
     def _log_spectrogram(self, spec_name, spectrogram):
         image = PIL.Image.open(plot_spectrogram_to_buf(spectrogram.cpu()))
