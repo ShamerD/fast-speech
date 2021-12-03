@@ -67,6 +67,8 @@ class GraphemeAligner(nn.Module):
             texts = [texts]
         batch_size = wavs.shape[0]
 
+        assert batch_size == len(texts)
+
         durations = []
         for index in range(batch_size):
             current_wav = wavs[index, :wav_lengths[index]].unsqueeze(dim=0)
