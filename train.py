@@ -4,7 +4,6 @@ import dataclasses
 import sys
 import warnings
 
-import numpy as np
 import torch
 
 import src.loss as module_loss
@@ -12,17 +11,10 @@ import src.model as module_model
 import src.utils.data as module_data
 from src.utils.data import get_dataloaders
 from src.trainer import Trainer
-from src.utils import prepare_device
+from src.utils import prepare_device, fix_seed
 from src.utils.config_parser import ConfigParser, CustomArgs
 
 warnings.filterwarnings("ignore", category=UserWarning)
-
-# fix random seeds for reproducibility
-SEED = 3407
-torch.manual_seed(SEED)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-np.random.seed(SEED)
 
 
 def main(config: ConfigParser):
@@ -83,6 +75,7 @@ def main(config: ConfigParser):
 
 
 if __name__ == "__main__":
+    fix_seed()
     sys.path.append('waveglow/')
     args = argparse.ArgumentParser(description="PyTorch Template")
     args.add_argument(

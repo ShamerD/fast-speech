@@ -2,13 +2,25 @@ from pathlib import Path
 from collections import OrderedDict
 from itertools import repeat
 import json
+import random
 
 import torch
 import pandas as pd
+import numpy as np
 
 ROOT_PATH = Path(__file__).absolute().resolve().parent.parent.parent
 DATA_DIR = ROOT_PATH / "data"
 CHECKPOINT_DIR = ROOT_PATH / "resources"
+SEED = 3407
+
+
+def fix_seed(seed=SEED):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 def ensure_dir(dirname):
