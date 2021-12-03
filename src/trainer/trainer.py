@@ -131,6 +131,9 @@ class Trainer(BaseTrainer):
             val_log = self._valid_epoch(epoch)
             log.update(**{"val_" + k: v for k, v in val_log.items()})
 
+        if self.do_inference:
+            self._inference_epoch(epoch)
+
         return log
 
     def process_batch(
@@ -215,20 +218,42 @@ class Trainer(BaseTrainer):
         return base.format(current, total, 100.0 * current / total)
 
     @torch.no_grad()
+    def _inference_epoch(self, epoch):
+        self.model.eval()
+        self.writer.set_step(epoch * self.len_epoch, "inference")
+
+        for batch_idx, batch in tqdm(
+                enumerate(self.inference_loader),
+                desc="inference",
+                total=len(self.inference_loader),
+        ):
+            batch = batch.to(self.device)
+            mels, _, mels_lens = self.model(batch)
+
+            batch.mels_pred = mels
+            batch.mels_pred_length = mels_lens
+
+            self._log_predictions(batch, inference_id=batch_idx + 1)
+
+    @torch.no_grad()
     def _log_predictions(
             self,
             batch: Batch,
+            inference_id=None
     ):
         if self.writer is None:
             return
 
         idx = random.randrange(len(batch.transcript))
 
-        self.writer.add_text("transcript", batch.transcript[idx])
-        self._log_spectrogram("true spectrogram", batch.mels[idx])
-        self._log_spectrogram("predicted spectrogram", batch.mels_pred[idx])
-        self._log_audio("true audio", batch.waveform[idx, :batch.waveform_length[idx]])
-        self._log_audio("generated audio", self.vocoder.inference(
+        if inference_id is None:
+            self._log_spectrogram("true spectrogram", batch.mels[idx])
+            self._log_audio("true audio", batch.waveform[idx, :batch.waveform_length[idx]])
+
+        name_suffix = str(inference_id) if inference_id is not None else ""
+        self.writer.add_text("transcript" + name_suffix, batch.transcript[idx])
+        self._log_spectrogram("predicted spectrogram" + name_suffix, batch.mels_pred[idx])
+        self._log_audio("generated audio" + name_suffix, self.vocoder.inference(
             batch.mels_pred[idx].unsqueeze(0)
         ).squeeze())
 
