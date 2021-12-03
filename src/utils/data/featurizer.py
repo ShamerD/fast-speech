@@ -61,3 +61,10 @@ class MelSpectrogram(nn.Module):
             .log_()
 
         return mel
+
+    def transform_wav_lengths(self, wav_lengths: torch.LongTensor):
+        return torch.div(
+            wav_lengths - self.config.win_length + self.config.hop_length,
+            self.config.hop_length,
+            rounding_mode='trunc'
+        )
