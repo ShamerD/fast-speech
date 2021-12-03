@@ -140,6 +140,7 @@ class Trainer(BaseTrainer):
             batch.mels = self.wav2mel(batch.waveform)
 
             # TODO: what to do with validation?
+            # TODO: wrong scaling to mels
             batch.durations = self.aligner(batch.waveform, batch.waveform_length, batch.transcript) * batch.mels.size(-1)
         batch = batch.to(self.device)
 
