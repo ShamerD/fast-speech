@@ -1,5 +1,5 @@
 {
-  "name": "default_config",
+  "name": "fast-speech",
   "n_gpu": 1,
   "mel_config": {
     "type": "MelSpectrogramConfig",
