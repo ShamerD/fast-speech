@@ -262,7 +262,7 @@ class Trainer(BaseTrainer):
         self.writer.add_text("transcript" + name_suffix, batch.transcript[idx])
         self._log_spectrogram("predicted spectrogram" + name_suffix, batch.mels_pred[idx])
         self._log_audio("generated audio" + name_suffix, self.vocoder.inference(
-            batch.mels_pred[idx, batch.mels_pred_length[idx]].unsqueeze(0)
+            batch.mels_pred[idx, :batch.mels_pred_length[idx]].unsqueeze(0)
         ).squeeze())
 
     def _log_spectrogram(self, spec_name, spectrogram):
