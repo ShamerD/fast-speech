@@ -268,6 +268,7 @@ class Trainer(BaseTrainer):
     def _log_spectrogram(self, spec_name, spectrogram):
         image = PIL.Image.open(plot_spectrogram_to_buf(spectrogram.cpu()))
         self.writer.add_image(spec_name, image)
+        image.close()
 
     def _log_audio(self, audio_name, audio):
         self.writer.add_audio(audio_name, audio.cpu(), self.wav2mel.config.sr)
