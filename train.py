@@ -4,12 +4,14 @@ import sys
 import warnings
 
 import torch
+from torch.optim.lr_scheduler import LambdaLR
 
 import src.loss as module_loss
 import src.model as module_model
 import src.utils.data as module_data
 from src.utils.data import get_dataloaders
 from src.trainer import Trainer
+from src.scheduler import LinearWarmupScheduler
 from src.utils import prepare_device, fix_seed
 from src.utils.config_parser import ConfigParser, CustomArgs
 
@@ -53,7 +55,19 @@ def main(config: ConfigParser):
     # build optimizer, learning rate scheduler. delete every lines containing lr_scheduler for disabling scheduler
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
     optimizer = config.init_obj(config["optimizer"], torch.optim, trainable_params)
-    lr_scheduler = config.init_obj(config["lr_scheduler"], torch.optim.lr_scheduler, optimizer)
+    if config["lr_scheduler"]["type"] == "LinearWarmupScheduler":
+        # Don't know how to configure this out
+        len_epoch = config["trainer"].get("len_epoch", len(dataloaders["train"]))
+        total_steps = config["trainer"]["epochs"] * len_epoch
+        warmup_steps = config["lr_scheduler"]["args"]["warmup_steps"]
+        if type(warmup_steps) == float:
+            warmup_steps = int(warmup_steps * total_steps)
+        lr_scheduler = LambdaLR(optimizer,
+                                lr_lambda=LinearWarmupScheduler(
+                                    model_config.d_model, total_steps=total_steps, warmup_steps=warmup_steps)
+                                )
+    else:
+        lr_scheduler = config.init_obj(config["lr_scheduler"], torch.optim.lr_scheduler, optimizer)
 
     trainer = Trainer(
         model,
