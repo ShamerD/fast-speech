@@ -16,6 +16,8 @@ class Encoder(nn.Module):
             *[FFTBlock(config) for _ in range(config.n_encoder_layers)]
         )
 
+        self._init_weights()
+
     def forward(self, x):
         """
         :param x: tokens of shape [B, N]
@@ -30,6 +32,10 @@ class Encoder(nn.Module):
 
         return self.net(x)
 
+    def _init_weights(self):
+        nn.init.normal_(self.emb.weight, mean=0.0, std=(self.emb.embedding_dim ** (-0.5)))
+        nn.init.normal_(self.pos_emb.weight, mean=0.0, std=(self.pos_emb.embedding_dim ** (-0.5)))
+
 
 class Decoder(nn.Module):
     def __init__(self, config: ModelConfig):
@@ -40,6 +46,8 @@ class Decoder(nn.Module):
         self.net = nn.Sequential(
             *[FFTBlock(config) for _ in range(config.n_decoder_layers)]
         )
+
+        self._init_weights()
 
     def forward(self, x):
         """
@@ -53,6 +61,9 @@ class Decoder(nn.Module):
         x = x + x_pos
 
         return self.net(x)
+
+    def _init_weights(self):
+        nn.init.normal_(self.pos_emb.weight, mean=0.0, std=(self.pos_emb.embedding_dim ** (-0.5)))
 
 
 class FastSpeech(nn.Module):

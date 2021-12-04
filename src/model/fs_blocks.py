@@ -26,6 +26,8 @@ class MultiHeadSelfAttention(nn.Module):
 
         self.drop = nn.Dropout(config.p_dropout)
 
+        self._init_weights()
+
     def forward(self, x, mask=None):
         """
         :param x: input sequence of shape [B, N, d_model] (we only need one sequence for self-attention)
@@ -53,6 +55,11 @@ class MultiHeadSelfAttention(nn.Module):
                          .reshape(bsize, seq_len, self.d_model)
 
         return self.out(attention)
+
+    def _init_weights(self):
+        nn.init.xavier_uniform_(self.Q.weight, gain=1.0)
+        nn.init.xavier_uniform(self.K.weight, gain=1.0)
+        nn.init.xavier_uniform(self.V.weight, gain=1.0)
 
 
 class FFTBlock(nn.Module):
