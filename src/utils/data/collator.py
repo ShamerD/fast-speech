@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from typing import Tuple, Optional, List
 
 import torch
@@ -27,26 +27,15 @@ class Batch:
     loss: Optional[torch.Tensor] = None
 
     def to(self, device: torch.device) -> 'Batch':
-        self.waveform = self.waveform.to(device)
-        self.waveform_length = self.waveform_length.to(device)
-
-        self.tokens = self.tokens.to(device)
-        self.token_lengths = self.token_lengths.to(device)
-
-        if self.durations is not None:
-            self.durations = self.durations.to(device)
-        if self.durations_pred is not None:
-            self.durations_pred = self.durations_pred.to(device)
-
-        if self.mels is not None:
-            self.mels = self.mels.to(device)
-        if self.mels_pred is not None:
-            self.mels_pred = self.mels_pred.to(device)
-
-        if self.mels_length is not None:
-            self.mels_length = self.mels_length.to(device)
-        if self.mels_pred_length is not None:
-            self.mels_pred_length = self.mels_pred_length.to(device)
+        for field in fields(self):
+            if field.name in ["mel_loss", "dur_loss", "loss", "transcript"]:
+                continue
+            if field.name in ["tokens", "token_lengths"]:
+                setattr(self, field.name, getattr(self, field.name).to(device))
+                continue
+            attr = getattr(self, field.name)
+            if attr is not None:
+                setattr(self, field.name, attr.to(device))
 
         return self
 

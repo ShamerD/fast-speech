@@ -38,6 +38,7 @@ class Trainer(BaseTrainer):
             lr_scheduler=None,
             len_epoch: Optional[int] = None,
             skip_oom: bool = True,
+            log_step: Optional[int] = None
     ):
         super().__init__(model, criterion, optimizer, config, device)
         self.wav2mel = wav2mel
@@ -63,7 +64,7 @@ class Trainer(BaseTrainer):
         self.do_inference = self.inference_loader is not None
 
         self.lr_scheduler = lr_scheduler
-        self.log_step = 100
+        self.log_step = log_step if log_step is not None else 100
 
         self.train_metrics = MetricTracker(
             "loss", "mel_loss", "duration_loss", "grad norm", writer=self.writer

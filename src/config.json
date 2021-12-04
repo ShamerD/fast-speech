@@ -37,11 +37,12 @@
   },
   "trainer": {
     "epochs": 200,
-    "save_dir": "saved/",
+    "save_dir": "resources/",
     "save_period": 10,
     "verbosity": 2,
     "monitor": "min val_loss",
     "visualize": "wandb",
+    "log_step": 100,
     "wandb_project": "tts_project",
     "len_epoch": 500,
     "grad_norm_clip": 10
