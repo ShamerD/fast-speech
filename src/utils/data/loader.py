@@ -1,6 +1,6 @@
 from typing import Dict
 
-from src.utils.data import LJSpeechDataset, LJSpeechCollator, TextDataset, TextCollator, LJ_DATA_DIR
+from src.utils.data import LJSpeechDataset, LJSpeechCollator, TextDataset, TextCollator
 from torch.utils.data import DataLoader, Subset
 
 import numpy as np
