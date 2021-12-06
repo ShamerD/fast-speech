@@ -53,7 +53,7 @@ def main(config: ConfigParser, loader: DataLoader, out_dir: Path):
             batch = batch.to(device)
 
             mels, _, mels_lens = model(batch)
-            audio = vocoder.inference(mels)  # not squeezing as batch dim becomes channel dim
+            audio = vocoder.inference(mels).cpu()  # not squeezing as batch dim becomes channel dim
 
             audio_path = audio_dir / (str(batch_num + 1) + ".wav")
             torchaudio.save(audio_path, audio, sample_rate=featurizer_config.sr)
