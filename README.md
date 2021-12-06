@@ -28,7 +28,7 @@ If not provided default samples will be used.
 python3 inference.py -c <config_file> -r <checkpoint> [-s <source_file>] [-t <target_directory>]
 ```
 
-For example :
+For example (will generate default samples):
 ```shell
 python3 inference.py -c configs/main.json -r resources/fastspeech.pth
 ```
