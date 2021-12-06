@@ -46,6 +46,7 @@ def main(config: ConfigParser, loader: DataLoader, out_dir: Path):
 
     results = []
     audio_dir = out_dir / "audio"
+    audio_dir.mkdir(parents=True, exist_ok=True)
 
     with torch.no_grad():
         for batch_num, batch in enumerate(tqdm(loader)):
