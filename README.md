@@ -15,6 +15,9 @@ chmod +x setup.sh && ./setup.sh
 python3 train.py -c <config_file> [-r <resume_checkpoint>] [--lr <learning_rate>] [--bs <batch_size>]
 ```
 
+If something with downloading model goes wrong, you can manually download model weights from [here](https://drive.google.com/file/d/1-YofXqcfDIk2SZZYRA0KJbi7NRs5xRZC/view?usp=sharing)
+and put them under `resources/fastspeech.pth`
+
 #### Inference:
 
 Input for inference is a text file with source sentences located in separate lines.
