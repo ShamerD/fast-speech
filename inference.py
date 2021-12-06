@@ -13,10 +13,10 @@ from tqdm import tqdm
 import src.model as module_model
 import src.utils.data as module_data
 from src.utils.data import TextDataset, TextCollator
-from src.utils import fix_seed, ROOT_PATH
+from src.utils import fix_seed, ROOT_PATH, CHECKPOINT_DIR
 from src.utils.config_parser import ConfigParser
 
-DEFAULT_CHECKPOINT_PATH = ROOT_PATH / "resources" / "fastspeech.pth"
+DEFAULT_CHECKPOINT_PATH = CHECKPOINT_DIR / "fastspeech.pth"
 DEFAULT_INFERENCE_PATH = ROOT_PATH / "inference"
 
 
@@ -43,6 +43,7 @@ def main(config: ConfigParser, loader: DataLoader, out_dir: Path):
     model = model.to(device)
     vocoder = vocoder.to(device)
     model.eval()
+    vocoder.eval()
 
     results = []
     audio_dir = out_dir / "audio"
@@ -55,7 +56,7 @@ def main(config: ConfigParser, loader: DataLoader, out_dir: Path):
             mels, _, mels_lens = model(batch)
             audio = vocoder.inference(mels)  # not squeezing as batch dim becomes channel dim
 
-            audio_path = audio_dir / str(batch_num + 1) / ".wav"
+            audio_path = audio_dir / (str(batch_num + 1) + ".wav")
             torchaudio.save(audio_path, audio, sample_rate=featurizer_config.sr)
             results.append({"transcript": batch.transcript[0], "audio": str(audio_path)})
 
