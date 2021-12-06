@@ -1,20 +1,19 @@
 import random
-from typing import Optional, List
+from typing import Optional
 
+import PIL
 import torch
 from torch import nn
 from torch.nn.utils import clip_grad_norm_
 from torch.utils.data import DataLoader
-
-import PIL
 from tqdm import tqdm
 
-from .base import BaseTrainer
+from src.logger.utils import plot_spectrogram_to_buf
+from src.model import FastSpeech, Waveglow, GraphemeAligner
+from src.utils import inf_loop, MetricTracker
 from src.utils.config_parser import ConfigParser
 from src.utils.data import Batch, MelSpectrogram
-from src.model import FastSpeech, Waveglow, GraphemeAligner
-from src.logger.utils import plot_spectrogram_to_buf
-from src.utils import inf_loop, MetricTracker
+from .base import BaseTrainer
 
 
 class Trainer(BaseTrainer):

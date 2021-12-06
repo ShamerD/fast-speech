@@ -9,11 +9,11 @@ from torch.optim.lr_scheduler import LambdaLR
 import src.loss as module_loss
 import src.model as module_model
 import src.utils.data as module_data
-from src.utils.data import get_dataloaders
-from src.trainer import Trainer
 from src.scheduler import LinearWarmupScheduler
+from src.trainer import Trainer
 from src.utils import prepare_device, fix_seed
 from src.utils.config_parser import ConfigParser, CustomArgs
+from src.utils.data import get_dataloaders
 
 warnings.filterwarnings("ignore", category=UserWarning)
 

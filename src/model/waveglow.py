@@ -1,9 +1,9 @@
 import warnings
 
 import torch
+from google_drive_downloader import GoogleDriveDownloader as gdd
 from torch import nn
 
-from google_drive_downloader import GoogleDriveDownloader as gdd
 from src.utils import CHECKPOINT_DIR
 
 

@@ -1,10 +1,10 @@
 from typing import Dict
 
-from src.utils.data import LJSpeechDataset, LJSpeechCollator, TextDataset, TextCollator
-from torch.utils.data import DataLoader, Subset
-
 import numpy as np
 from numpy.random import shuffle
+from torch.utils.data import DataLoader, Subset
+
+from src.utils.data import LJSpeechDataset, LJSpeechCollator, TextDataset, TextCollator
 
 
 def get_dataloaders(data_config: Dict):

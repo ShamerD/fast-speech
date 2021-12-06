@@ -2,11 +2,11 @@ import collections
 import json
 import logging
 import os
-from typing import List
 from datetime import datetime
 from functools import reduce, partial
 from operator import getitem
 from pathlib import Path
+from typing import List
 
 from src.logger import setup_logging
 from src.utils import read_json, write_json, ROOT_PATH

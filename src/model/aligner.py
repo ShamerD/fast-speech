@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 from typing import List, Union
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 import torch
+import torchaudio
 from torch import nn
 from torch.nn.utils.rnn import pad_sequence
 
-import torchaudio
-
-from src.utils.data import MelSpectrogramConfig
 from src.utils import CHECKPOINT_DIR
+from src.utils.data import MelSpectrogramConfig
+
 
 @dataclass
 class Point:

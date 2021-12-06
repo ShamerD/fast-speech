@@ -5,16 +5,15 @@ import sys
 from pathlib import Path
 
 import torch
-from torch.utils.data import DataLoader
-
 import torchaudio
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 import src.model as module_model
 import src.utils.data as module_data
-from src.utils.data import TextDataset, TextCollator
 from src.utils import fix_seed, ROOT_PATH, CHECKPOINT_DIR
 from src.utils.config_parser import ConfigParser
+from src.utils.data import TextDataset, TextCollator
 
 DEFAULT_CHECKPOINT_PATH = CHECKPOINT_DIR / "fastspeech.pth"
 DEFAULT_INFERENCE_PATH = ROOT_PATH / "inference"

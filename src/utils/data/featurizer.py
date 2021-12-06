@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 
-import torch
-from torch import nn
-
-import torchaudio
 import librosa
+import torch
+import torchaudio
+from torch import nn
 
 
 @dataclass

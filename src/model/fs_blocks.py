@@ -1,9 +1,8 @@
-from typing import List
-
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 from torch.nn.utils.rnn import pad_sequence
+
 from src.model.default_config import ModelConfig
 
 

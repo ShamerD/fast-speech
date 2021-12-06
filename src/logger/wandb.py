@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import numpy as np
 
 from src.utils.config_parser import ConfigParser
