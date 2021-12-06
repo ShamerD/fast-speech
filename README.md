@@ -36,8 +36,8 @@ Default samples:
 
 ## Project structure
 * `configs/` contains configs which were used to train model
-* `data/` contains data (LJSpeech downloads there by default) and trainval split
-* `notebooks` contains notebooks which show how the model was trained
-* `src` contains source codes
+* `data/` contains data (LJSpeech downloads there by default) and trainval split (indices in dataset)
+* `notebooks/` contains notebooks which show how the model was trained
+* `src/` contains source codes
 * `train.py` is a training script (it downloads all needed data if it is not present)
 * `inference.py` is an inference script which takes text file and outputs audio files in a directory
