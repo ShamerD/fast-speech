@@ -57,8 +57,8 @@ class MultiHeadSelfAttention(nn.Module):
 
     def _init_weights(self):
         nn.init.xavier_uniform_(self.Q.weight, gain=1.0)
-        nn.init.xavier_uniform(self.K.weight, gain=1.0)
-        nn.init.xavier_uniform(self.V.weight, gain=1.0)
+        nn.init.xavier_uniform_(self.K.weight, gain=1.0)
+        nn.init.xavier_uniform_(self.V.weight, gain=1.0)
 
 
 class FFTBlock(nn.Module):
