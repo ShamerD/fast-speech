@@ -2,12 +2,10 @@ from datetime import datetime
 
 import numpy as np
 
-from src.utils.config_parser import ConfigParser
-
 
 class WanDBWriter:
     def __init__(self,
-                 config: ConfigParser,
+                 config,
                  logger):
         self.writer = None
         self.selected_module = ""
